@@ -3,7 +3,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-!**/src/main/resources/ktor-server-admin-sdk.json
+
+**/src/main/resources/ktor-server-admin-sdk.json
 
 ### STS ###
 .apt_generated
