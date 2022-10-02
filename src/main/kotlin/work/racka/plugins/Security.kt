@@ -33,6 +33,9 @@ fun Application.configureSecurity() {
     authentication {
         firebase(name = "firebase") {
             configure()
+            onFailedAuth = {
+                // Do Something
+            }
         }
         basic(name = "myauth1") {
             realm = "Ktor Server"

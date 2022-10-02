@@ -14,10 +14,12 @@ import org.slf4j.LoggerFactory
 
 private val firebaseAuthLogger = LoggerFactory.getLogger("io.robothouse.auth.firebase")
 
-class FirebaseAuthenticationProvider internal constructor(config: Configuration) : AuthenticationProvider(config) {
+class FirebaseAuthenticationProvider internal constructor(config: Configuration) :
+    AuthenticationProvider(config) {
 
-    internal val token: (ApplicationCall) -> String? = config.token
-    internal val principle: ((uid: String) -> Principal?)? = config.principal
+    private val token: (ApplicationCall) -> String? = config.token
+    private val principle: ((uid: String) -> Principal?)? = config.principal
+    private val challenge: suspend () -> Unit = config.onFailedAuth
 
     class Configuration internal constructor(name: String?) : AuthenticationProvider.Config(name) {
         internal var token: (ApplicationCall) -> String? = { call ->
@@ -25,6 +27,8 @@ class FirebaseAuthenticationProvider internal constructor(config: Configuration)
         }
 
         internal var principal: ((uid: String) -> Principal?)? = null
+
+        internal var onFailedAuth: suspend () -> Unit = {}
 
         internal fun build() = FirebaseAuthenticationProvider(this)
     }
@@ -53,6 +57,7 @@ class FirebaseAuthenticationProvider internal constructor(config: Configuration)
             firebaseAuthLogger.trace(message)
             context.call.respond(HttpStatusCode.Unauthorized, message)
             context.challenge.complete()
+            challenge()
         }
     }
 }
